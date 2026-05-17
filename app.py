@@ -53,10 +53,19 @@ def inject_css():
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
     html, body, [class*="css"] { font-family: var(--font); }
-    header { visibility: hidden; }
-    /* Keep the sidebar reopen button visible even when header is hidden */
-    [data-testid="collapsedControl"] { visibility: visible !important; }
-    button[data-testid="baseButton-headerNoPadding"] { visibility: visible !important; }
+
+    /* Hide Streamlit chrome without touching the sidebar toggle */
+    [data-testid="stToolbar"]      { display: none !important; }
+    [data-testid="stDecoration"]   { display: none !important; }
+    [data-testid="stStatusWidget"] { display: none !important; }
+    #MainMenu                      { display: none !important; }
+    footer                         { display: none !important; }
+    /* Make header transparent so sidebar toggle buttons remain interactive */
+    header[data-testid="stHeader"] {
+        background: transparent !important;
+        box-shadow: none !important;
+        border-bottom: none !important;
+    }
 
     .stApp {
         background: linear-gradient(145deg, #eef2ff 0%, #f8fafc 45%, #ecfdf5 100%);
