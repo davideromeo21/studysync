@@ -54,17 +54,45 @@ def inject_css():
 
     html, body, [class*="css"] { font-family: var(--font); }
 
-    /* Hide Streamlit chrome without touching the sidebar toggle */
+    /* Hide Streamlit chrome — but never touch the sidebar toggle */
     [data-testid="stToolbar"]      { display: none !important; }
-    [data-testid="stDecoration"]   { display: none !important; }
     [data-testid="stStatusWidget"] { display: none !important; }
     #MainMenu                      { display: none !important; }
     footer                         { display: none !important; }
-    /* Make header transparent so sidebar toggle buttons remain interactive */
+    /* Decoration bar: hide the rainbow strip only, not surrounding elements */
+    [data-testid="stDecorationData"] { display: none !important; }
+    /* Keep header minimal but visible so the toggle sits in a clickable area */
     header[data-testid="stHeader"] {
         background: transparent !important;
         box-shadow: none !important;
         border-bottom: none !important;
+        height: 2.875rem !important;
+        min-height: 2.875rem !important;
+    }
+
+    /* ── Sidebar toggle buttons — always visible ────────────────── */
+    /* Button that closes the sidebar (chevron left) */
+    [data-testid="stSidebarCollapseButton"] button {
+        background: white !important;
+        border: 1.5px solid var(--border) !important;
+        border-radius: var(--radius-sm) !important;
+        box-shadow: var(--shadow-sm) !important;
+        color: var(--primary) !important;
+    }
+    /* Button that reopens the sidebar when it is collapsed */
+    [data-testid="collapsedControl"],
+    button[data-testid="collapsedControl"] {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    [data-testid="collapsedControl"] button {
+        background: white !important;
+        border: 1.5px solid var(--border) !important;
+        border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important;
+        box-shadow: var(--shadow-md) !important;
+        color: var(--primary) !important;
+        padding: 10px 8px !important;
     }
 
     .stApp {
