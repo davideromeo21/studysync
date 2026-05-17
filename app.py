@@ -16,7 +16,7 @@ st.set_page_config(
     page_title="StudySync — Find Your Study Partner",
     page_icon="🎓",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 # ── Design System & CSS ──────────────────────────────────────────────────────
@@ -28,6 +28,12 @@ def inject_css():
         --primary:       #4f46e5;
         --primary-dark:  #3730a3;
         --primary-light: #818cf8;
+        --violet:        #7c3aed;
+        --cyan:          #06b6d4;
+        --teal:          #0d9488;
+        --emerald:       #059669;
+        --amber:         #d97706;
+        --rose:          #e11d48;
         --accent:        #06b6d4;
         --success:       #10b981;
         --warning:       #f59e0b;
@@ -44,8 +50,8 @@ def inject_css():
         --radius-lg:     18px;
         --radius-xl:     24px;
         --shadow-sm:     0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-        --shadow-md:     0 4px 16px rgba(0,0,0,0.07), 0 2px 6px rgba(0,0,0,0.04);
-        --shadow-lg:     0 20px 60px rgba(0,0,0,0.10), 0 6px 20px rgba(79,70,229,0.08);
+        --shadow-md:     0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
+        --shadow-lg:     0 20px 60px rgba(0,0,0,0.12), 0 6px 20px rgba(79,70,229,0.10);
         --font:          'Inter', system-ui, sans-serif;
     }
 
@@ -54,49 +60,28 @@ def inject_css():
 
     html, body, [class*="css"] { font-family: var(--font); }
 
-    /* Hide Streamlit chrome — but never touch the sidebar toggle */
-    [data-testid="stToolbar"]      { display: none !important; }
-    [data-testid="stStatusWidget"] { display: none !important; }
-    #MainMenu                      { display: none !important; }
-    footer                         { display: none !important; }
-    /* Decoration bar: hide the rainbow strip only, not surrounding elements */
-    [data-testid="stDecorationData"] { display: none !important; }
-    /* Keep header minimal but visible so the toggle sits in a clickable area */
-    header[data-testid="stHeader"] {
-        background: transparent !important;
-        box-shadow: none !important;
-        border-bottom: none !important;
-        height: 2.875rem !important;
-        min-height: 2.875rem !important;
-    }
-
-    /* ── Sidebar toggle buttons — always visible ────────────────── */
-    /* Button that closes the sidebar (chevron left) */
-    [data-testid="stSidebarCollapseButton"] button {
-        background: white !important;
-        border: 1.5px solid var(--border) !important;
-        border-radius: var(--radius-sm) !important;
-        box-shadow: var(--shadow-sm) !important;
-        color: var(--primary) !important;
-    }
-    /* Button that reopens the sidebar when it is collapsed */
+    /* Hide Streamlit chrome completely */
+    [data-testid="stToolbar"],
+    [data-testid="stDecoration"],
+    [data-testid="stStatusWidget"],
+    [data-testid="stSidebarCollapseButton"],
     [data-testid="collapsedControl"],
-    button[data-testid="collapsedControl"] {
-        display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
-    [data-testid="collapsedControl"] button {
-        background: white !important;
-        border: 1.5px solid var(--border) !important;
-        border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important;
-        box-shadow: var(--shadow-md) !important;
-        color: var(--primary) !important;
-        padding: 10px 8px !important;
+    header[data-testid="stHeader"],
+    #MainMenu, footer { display: none !important; }
+
+    /* Collapse the sidebar entirely — nav is top-bar only */
+    section[data-testid="stSidebar"] { display: none !important; }
+
+    /* Full-width main area */
+    .block-container {
+        max-width: 1280px !important;
+        padding-top: 0.5rem !important;
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
     }
 
     .stApp {
-        background: linear-gradient(145deg, #eef2ff 0%, #f8fafc 45%, #ecfdf5 100%);
+        background: linear-gradient(135deg, #f0f4ff 0%, #fafafa 40%, #f0fdf4 100%);
         min-height: 100vh;
     }
 
@@ -124,6 +109,65 @@ def inject_css():
     }
     @keyframes spin {
         to { transform: rotate(360deg); }
+    }
+
+    /* ── Top navigation bar ─────────────────────────────────────── */
+    .topnav-wrap {
+        background: white;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border);
+        padding: 10px 20px;
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        animation: fadeIn 0.3s ease;
+    }
+    .topnav-brand {
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: -0.4px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--violet) 60%, var(--cyan) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        white-space: nowrap;
+    }
+    .topnav-user {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .topnav-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 2.5px solid var(--primary-light);
+        box-shadow: 0 0 0 3px rgba(129,140,248,0.15);
+    }
+    .topnav-name {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1.2;
+    }
+    .topnav-handle {
+        font-size: 11px;
+        color: var(--text-muted);
+    }
+    .topnav-progress-wrap {
+        width: 80px;
+        height: 4px;
+        background: var(--border);
+        border-radius: 999px;
+        overflow: hidden;
+        margin-top: 3px;
+    }
+    .topnav-progress-fill {
+        height: 100%;
+        border-radius: 999px;
+        transition: width 0.4s ease;
     }
 
     /* ── Auth layout ────────────────────────────────────────────── */
@@ -285,56 +329,6 @@ def inject_css():
         box-shadow: 0 0 0 3px rgba(129,140,248,0.18) !important;
     }
 
-    /* ── Sidebar ────────────────────────────────────────────────── */
-    section[data-testid="stSidebar"] {
-        background: var(--surface) !important;
-        border-right: 1px solid var(--border) !important;
-    }
-    .sidebar-user-card {
-        background: linear-gradient(135deg, #eef2ff, #e0e7ff);
-        border-radius: var(--radius-md);
-        padding: 14px;
-        margin-bottom: 4px;
-        border: 1px solid #c7d2fe;
-    }
-    .sidebar-avatar {
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        border: 2px solid #a5b4fc;
-        display: block;
-        margin-bottom: 10px;
-    }
-    .sidebar-user-card .username {
-        color: var(--primary-dark);
-        font-weight: 700;
-        font-size: 15px;
-    }
-    .sidebar-user-card .handle {
-        color: var(--text-secondary);
-        font-size: 12px;
-        margin-top: 2px;
-    }
-    .sidebar-completion {
-        margin-top: 10px;
-        font-size: 11px;
-        color: var(--text-secondary);
-        font-weight: 500;
-    }
-    .sidebar-completion-bar {
-        height: 5px;
-        background: #c7d2fe;
-        border-radius: 999px;
-        margin-top: 4px;
-        overflow: hidden;
-    }
-    .sidebar-completion-fill {
-        height: 100%;
-        background: linear-gradient(90deg, var(--primary), var(--accent));
-        border-radius: 999px;
-        transition: width 0.5s ease;
-    }
-
     /* ── Metric cards ───────────────────────────────────────────── */
     .metric-card {
         background: var(--surface);
@@ -343,20 +337,30 @@ def inject_css():
         box-shadow: var(--shadow-sm);
         text-align: center;
         border-top: 4px solid var(--primary);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: transform 0.22s ease, box-shadow 0.22s ease;
         animation: fadeInUp 0.4s ease both;
+        position: relative;
+        overflow: hidden;
+    }
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 100%;
+        background: linear-gradient(180deg, rgba(79,70,229,0.04) 0%, transparent 60%);
+        pointer-events: none;
     }
     .metric-card:hover {
-        transform: translateY(-3px);
+        transform: translateY(-4px);
         box-shadow: var(--shadow-md);
     }
     .metric-card h4 {
         color: var(--text-muted);
-        font-size: 11px;
+        font-size: 10px;
         text-transform: uppercase;
-        letter-spacing: 1.4px;
+        letter-spacing: 1.6px;
         margin-bottom: 8px;
-        font-weight: 600;
+        font-weight: 700;
     }
     .metric-card h2 {
         color: var(--text-primary);
@@ -364,10 +368,17 @@ def inject_css():
         font-weight: 700;
         margin: 0;
     }
-    .metric-card.green  { border-top-color: var(--success); }
-    .metric-card.amber  { border-top-color: var(--warning); }
-    .metric-card.purple { border-top-color: #8b5cf6; }
+    .metric-card.green  { border-top-color: var(--emerald); }
+    .metric-card.green::before  { background: linear-gradient(180deg,rgba(5,150,105,0.05) 0%,transparent 60%); }
+    .metric-card.amber  { border-top-color: var(--amber); }
+    .metric-card.amber::before  { background: linear-gradient(180deg,rgba(217,119,6,0.05) 0%,transparent 60%); }
+    .metric-card.purple { border-top-color: var(--violet); }
+    .metric-card.purple::before { background: linear-gradient(180deg,rgba(124,58,237,0.05) 0%,transparent 60%); }
+    .metric-card.cyan   { border-top-color: var(--cyan); }
+    .metric-card.cyan::before   { background: linear-gradient(180deg,rgba(6,182,212,0.05) 0%,transparent 60%); }
     .metric-card.indigo { border-top-color: var(--primary); }
+    .metric-card.rose   { border-top-color: var(--rose); }
+    .metric-card.rose::before   { background: linear-gradient(180deg,rgba(225,29,72,0.05) 0%,transparent 60%); }
 
     /* ── Section headers ────────────────────────────────────────── */
     .section-title {
@@ -404,15 +415,22 @@ def inject_css():
         background: #f1f5f9;
         color: var(--text-secondary);
         border-radius: 999px;
-        padding: 3px 10px;
+        padding: 3px 11px;
         font-size: 12px;
-        font-weight: 500;
+        font-weight: 600;
         margin: 2px;
+        border: 1px solid #e2e8f0;
+        letter-spacing: 0.1px;
     }
-    .tag-pill.blue   { background: #e0e7ff; color: #3730a3; }
-    .tag-pill.green  { background: #d1fae5; color: #065f46; }
-    .tag-pill.purple { background: #ede9fe; color: #5b21b6; }
-    .tag-pill.amber  { background: #fef3c7; color: #92400e; }
+    .tag-pill.blue   { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+    .tag-pill.indigo { background: #eef2ff; color: #3730a3; border-color: #c7d2fe; }
+    .tag-pill.violet { background: #f5f3ff; color: #5b21b6; border-color: #ddd6fe; }
+    .tag-pill.green  { background: #f0fdf4; color: #065f46; border-color: #bbf7d0; }
+    .tag-pill.teal   { background: #f0fdfa; color: #0f766e; border-color: #99f6e4; }
+    .tag-pill.cyan   { background: #ecfeff; color: #0e7490; border-color: #a5f3fc; }
+    .tag-pill.amber  { background: #fffbeb; color: #92400e; border-color: #fde68a; }
+    .tag-pill.rose   { background: #fff1f2; color: #9f1239; border-color: #fecdd3; }
+    .tag-pill.purple { background: #faf5ff; color: #6b21a8; border-color: #e9d5ff; }
 
     /* ── Score badge ────────────────────────────────────────────── */
     .score-badge {
@@ -428,7 +446,7 @@ def inject_css():
         display: flex;
         align-items: flex-start;
         gap: 12px;
-        padding: 12px 14px;
+        padding: 12px 16px;
         background: var(--surface);
         border-radius: var(--radius-sm);
         border-left: 3px solid var(--primary);
@@ -437,7 +455,9 @@ def inject_css():
         color: var(--text-primary);
         box-shadow: var(--shadow-sm);
         animation: fadeInUp 0.3s ease both;
+        transition: border-color 0.2s ease;
     }
+    .activity-item:hover { border-left-color: var(--violet); }
 
     /* ── Kanban ─────────────────────────────────────────────────── */
     .kanban-header {
@@ -491,7 +511,8 @@ def inject_css():
     /* ── Page header ────────────────────────────────────────────── */
     .page-header {
         padding: 4px 0 20px;
-        border-bottom: 1px solid var(--border);
+        border-bottom: 2px solid transparent;
+        border-image: linear-gradient(90deg, var(--primary), var(--violet), var(--cyan)) 1;
         margin-bottom: 24px;
         animation: fadeInUp 0.35s ease;
     }
@@ -507,6 +528,41 @@ def inject_css():
         font-size: 14px;
         margin: 0;
     }
+
+    /* ── Score / match badges ───────────────────────────────────── */
+    .match-score-high   { color: #059669; font-weight: 800; }
+    .match-score-mid    { color: #d97706; font-weight: 800; }
+    .match-score-low    { color: #dc2626; font-weight: 800; }
+
+    /* ── Kanban columns ─────────────────────────────────────────── */
+    .kanban-header.todo   { border-left: 3px solid #94a3b8; }
+    .kanban-header.doing  { border-left: 3px solid #f59e0b; }
+    .kanban-header.done   { border-left: 3px solid #10b981; }
+    .kanban-header.review { border-left: 3px solid #8b5cf6; }
+
+    /* ── Scrollbar ──────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* ── Streamlit tab strip ────────────────────────────────────── */
+    [data-baseweb="tab-list"] {
+        gap: 4px;
+        background: var(--surface-2) !important;
+        border-radius: var(--radius-sm);
+        padding: 4px;
+    }
+    [data-baseweb="tab"] {
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        font-size: 13px !important;
+    }
+    [aria-selected="true"][data-baseweb="tab"] {
+        background: white !important;
+        box-shadow: var(--shadow-sm) !important;
+    }
+
     </style>
     """, unsafe_allow_html=True)
 
@@ -715,78 +771,98 @@ def maybe_show_onboarding(user: dict):
     _onboarding()
 
 
-# ── Sidebar ──────────────────────────────────────────────────────────────────
+# ── Top navigation ────────────────────────────────────────────────────────────
 
 _VIEW_NAMES = ["Dashboard", "My Profile", "Availability", "Matches & Groups", "Workspaces"]
+_VIEW_ICONS = ["grid-1x2", "person-circle", "calendar3", "people-fill", "kanban"]
 
 
-def render_sidebar(user: dict, completion: int):
+def render_topnav(user: dict, completion: int) -> str:
     from utils import get_avatar_url
-    with st.sidebar:
-        display_name = user.get('name') or user['username']
-        avatar_url   = get_avatar_url(user['username'])
 
-        st.markdown(
-            f"""<div class='sidebar-user-card'>
-                <img src='{avatar_url}' class='sidebar-avatar'>
-                <div class='username'>🎓 {display_name}</div>
-                <div class='handle'>@{user['username']}</div>
-                <div class='sidebar-completion'>{completion}% profile complete</div>
-                <div class='sidebar-completion-bar'>
-                    <div class='sidebar-completion-fill' style='width:{completion}%;'></div>
-                </div>
-            </div>""",
-            unsafe_allow_html=True,
-        )
+    display_name = user.get('name') or user['username']
+    avatar_url   = get_avatar_url(user['username'])
+    comp_color   = "#059669" if completion == 100 else ("#d97706" if completion >= 50 else "#4f46e5")
 
-        st.markdown("<br>", unsafe_allow_html=True)
+    col_brand, col_spacer, col_user = st.columns([2, 1, 3])
 
-        # Persist active page across reruns
-        current_view = st.session_state.get('selected_view', 'Dashboard')
-        default_idx = _VIEW_NAMES.index(current_view) if current_view in _VIEW_NAMES else 0
+    with col_brand:
+        st.markdown("<div class='topnav-brand'>🎓 StudySync</div>", unsafe_allow_html=True)
 
-        selected = option_menu(
-            menu_title=None,
-            options=_VIEW_NAMES,
-            icons=["grid-1x2", "person-circle", "calendar3", "people-fill", "kanban"],
-            default_index=default_idx,
-            styles={
-                "container":  {"padding": "0!important", "background-color": "transparent"},
-                "icon":       {"color": "#4f46e5", "font-size": "16px"},
-                "nav-link": {
-                    "font-size": "14px", "text-align": "left", "margin": "2px 0",
-                    "--hover-color": "#eef2ff", "border-radius": "10px",
-                    "padding": "10px 14px",
-                },
-                "nav-link-selected": {
-                    "background": "linear-gradient(135deg, #4f46e5, #3730a3)",
-                    "color": "white", "font-weight": "600", "border-radius": "10px",
-                },
-            }
-        )
-        # Persist selection so reruns (e.g., post-join) land on the right page
-        st.session_state['selected_view'] = selected
-
-        st.markdown("---")
-
-        # Sign-out with confirmation
-        if not st.session_state.get('confirm_signout'):
-            if st.button("Sign Out", use_container_width=True):
-                st.session_state['confirm_signout'] = True
-                st.rerun()
-        else:
-            st.warning("Sign out?")
-            c1, c2 = st.columns(2)
-            with c1:
-                if st.button("Yes", type="primary", use_container_width=True, key="signout_yes"):
-                    for key in list(st.session_state.keys()):
-                        del st.session_state[key]
+    with col_user:
+        uc1, uc2 = st.columns([3, 2])
+        with uc1:
+            st.markdown(
+                f"<div class='topnav-user'>"
+                f"<img src='{avatar_url}' class='topnav-avatar'>"
+                f"<div>"
+                f"<div class='topnav-name'>{display_name}</div>"
+                f"<div class='topnav-handle'>@{user['username']}</div>"
+                f"<div class='topnav-progress-wrap'>"
+                f"<div class='topnav-progress-fill' style='width:{completion}%;background:{comp_color};'></div>"
+                f"</div>"
+                f"</div>"
+                f"</div>",
+                unsafe_allow_html=True,
+            )
+        with uc2:
+            if not st.session_state.get('confirm_signout'):
+                if st.button("Sign Out", use_container_width=True, key="topnav_signout"):
+                    st.session_state['confirm_signout'] = True
                     st.rerun()
-            with c2:
-                if st.button("Cancel", use_container_width=True, key="signout_no"):
-                    st.session_state.pop('confirm_signout', None)
-                    st.rerun()
+            else:
+                st.caption("Sign out?")
+                so1, so2 = st.columns(2)
+                with so1:
+                    if st.button("Yes", type="primary", use_container_width=True, key="so_yes"):
+                        for k in list(st.session_state.keys()):
+                            del st.session_state[k]
+                        st.rerun()
+                with so2:
+                    if st.button("No", use_container_width=True, key="so_no"):
+                        st.session_state.pop('confirm_signout', None)
+                        st.rerun()
 
+    # Horizontal navigation menu
+    current_view = st.session_state.get('selected_view', 'Dashboard')
+    default_idx  = _VIEW_NAMES.index(current_view) if current_view in _VIEW_NAMES else 0
+
+    selected = option_menu(
+        menu_title=None,
+        options=_VIEW_NAMES,
+        icons=_VIEW_ICONS,
+        default_index=default_idx,
+        orientation="horizontal",
+        styles={
+            "container": {
+                "padding": "6px 8px",
+                "background-color": "white",
+                "border-radius": "14px",
+                "box-shadow": "0 2px 12px rgba(79,70,229,0.10)",
+                "border": "1px solid #e2e8f0",
+                "margin-bottom": "4px",
+            },
+            "icon":       {"font-size": "15px"},
+            "nav-link": {
+                "font-size": "13px",
+                "font-weight": "600",
+                "padding": "9px 18px",
+                "border-radius": "10px",
+                "color": "#64748b",
+                "--hover-color": "#eef2ff",
+                "text-align": "center",
+                "white-space": "nowrap",
+            },
+            "nav-link-selected": {
+                "background": "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
+                "color": "white",
+                "font-weight": "700",
+                "border-radius": "10px",
+                "box-shadow": "0 4px 14px rgba(79,70,229,0.35)",
+            },
+        },
+    )
+    st.session_state['selected_view'] = selected
     return selected
 
 
@@ -801,7 +877,7 @@ else:
     completion = calculate_profile_completion(user)
 
     maybe_show_onboarding(user)
-    selected_view = render_sidebar(user, completion)
+    selected_view = render_topnav(user, completion)
 
     if selected_view == "Dashboard":
         dashboard.render()
