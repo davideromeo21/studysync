@@ -689,6 +689,9 @@ def maybe_show_onboarding(user: dict):
 
 # ── Sidebar ──────────────────────────────────────────────────────────────────
 
+_VIEW_NAMES = ["Dashboard", "My Profile", "Availability", "Matches & Groups", "Workspaces"]
+
+
 def render_sidebar(user: dict, completion: int):
     from utils import get_avatar_url
     with st.sidebar:
@@ -710,11 +713,15 @@ def render_sidebar(user: dict, completion: int):
 
         st.markdown("<br>", unsafe_allow_html=True)
 
+        # Persist active page across reruns
+        current_view = st.session_state.get('selected_view', 'Dashboard')
+        default_idx = _VIEW_NAMES.index(current_view) if current_view in _VIEW_NAMES else 0
+
         selected = option_menu(
             menu_title=None,
-            options=["Dashboard", "My Profile", "Availability", "Matches & Groups", "Workspaces"],
+            options=_VIEW_NAMES,
             icons=["grid-1x2", "person-circle", "calendar3", "people-fill", "kanban"],
-            default_index=0,
+            default_index=default_idx,
             styles={
                 "container":  {"padding": "0!important", "background-color": "transparent"},
                 "icon":       {"color": "#4f46e5", "font-size": "16px"},
@@ -729,12 +736,28 @@ def render_sidebar(user: dict, completion: int):
                 },
             }
         )
+        # Persist selection so reruns (e.g., post-join) land on the right page
+        st.session_state['selected_view'] = selected
 
         st.markdown("---")
-        if st.button("Sign Out", use_container_width=True):
-            for key in list(st.session_state.keys()):
-                del st.session_state[key]
-            st.rerun()
+
+        # Sign-out with confirmation
+        if not st.session_state.get('confirm_signout'):
+            if st.button("Sign Out", use_container_width=True):
+                st.session_state['confirm_signout'] = True
+                st.rerun()
+        else:
+            st.warning("Sign out?")
+            c1, c2 = st.columns(2)
+            with c1:
+                if st.button("Yes", type="primary", use_container_width=True, key="signout_yes"):
+                    for key in list(st.session_state.keys()):
+                        del st.session_state[key]
+                    st.rerun()
+            with c2:
+                if st.button("Cancel", use_container_width=True, key="signout_no"):
+                    st.session_state.pop('confirm_signout', None)
+                    st.rerun()
 
     return selected
 
@@ -746,8 +769,7 @@ if not st.session_state.logged_in:
 else:
     user = database.get_user_by_id(st.session_state.user_id)
 
-    # Compute completion for sidebar
-    from views.dashboard import calculate_profile_completion
+    from utils import calculate_profile_completion
     completion = calculate_profile_completion(user)
 
     maybe_show_onboarding(user)

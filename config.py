@@ -1,4 +1,7 @@
-"""Shared configuration and constants for Study Group Matcher Pro."""
+"""Shared configuration and constants for Study Group Matcher Pro.
+
+score_color / score_label have moved to utils.py — import from there.
+"""
 
 AVAILABLE_SUBJECTS = [
     # STEM
@@ -69,23 +72,10 @@ DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sun
 TIMESLOTS = ["Morning (8am-12pm)", "Afternoon (12pm-5pm)", "Evening (5pm-10pm)"]
 SLOT_ICONS = ["🌅", "☀️", "🌙"]
 
-# Score color thresholds
-def score_color(score: int) -> str:
-    if score >= 70:
-        return "#10b981"   # green
-    elif score >= 40:
-        return "#f59e0b"   # amber
-    else:
-        return "#3b82f6"   # blue
-
-def score_label(score: int) -> str:
-    if score >= 80:
-        return "Excellent"
-    elif score >= 60:
-        return "Strong"
-    elif score >= 40:
-        return "Good"
-    elif score >= 20:
-        return "Moderate"
-    else:
-        return "Low"
+# Vibe incompatibility pairs — (set_a, set_b): penalty points
+# A conflict fires when user1 has any vibe in set_a AND user2 has any vibe in set_b (or vice-versa).
+VIBE_CONFLICT_PAIRS: list[tuple[set, set]] = [
+    ({"Silent 3 Hours"}, {"Chatty"}),
+    ({"Intense Focus"}, {"Snacks & Study", "Chatty"}),
+]
+VIBE_CONFLICT_PENALTY = 8  # points deducted per conflict pair triggered

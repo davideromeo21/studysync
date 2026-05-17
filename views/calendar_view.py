@@ -2,6 +2,7 @@ import streamlit as st
 import database
 from matcher import MatcherService
 from config import DAYS, TIMESLOTS, SLOT_ICONS
+from utils import invalidate_match_cache, score_color
 
 WEEKDAYS = DAYS[:5]
 
@@ -106,9 +107,8 @@ def render():
         if submitted:
             success = database.set_user_availability(user_id, new_selection)
             if success:
-                # Bust matcher cache so new availability is reflected
-                cache_key = f"matches_{user_id}"
-                st.session_state.pop(cache_key, None)
+                invalidate_match_cache(user_id)
+                database.log_activity(user_id, 'availability_saved', {})
                 st.toast("Availability saved!", icon="📅")
                 st.rerun()
             else:
@@ -136,9 +136,10 @@ def render():
                 with st.container(border=True):
                     col1, col2 = st.columns([2, 3])
                     with col1:
+                        sc = score_color(match['score'])
                         st.markdown(
                             f"**{name}** &nbsp; "
-                            f"<span style='color:#10b981;font-weight:700;'>{match['score']}%</span>",
+                            f"<span style='color:{sc};font-weight:700;'>{match['score']}%</span>",
                             unsafe_allow_html=True,
                         )
                         st.caption(mu.get('course') or "")

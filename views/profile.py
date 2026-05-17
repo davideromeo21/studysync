@@ -4,8 +4,7 @@ from config import (
     AVAILABLE_SUBJECTS, AVAILABLE_GOALS, AVAILABLE_STYLES,
     AVAILABLE_ENVIRONMENTS, AVAILABLE_VIBES, AVAILABLE_DEGREES,
 )
-from views.dashboard import calculate_profile_completion
-from utils import get_avatar_url
+from utils import get_avatar_url, calculate_profile_completion, invalidate_match_cache
 
 
 def render():
@@ -77,6 +76,7 @@ def render():
                     placeholder="e.g. BSc Data Science",
                 )
                 campus = st.text_input("Campus", value=user.get('campus') or "", placeholder="e.g. Main Campus")
+            submitted_t1 = st.form_submit_button("Save Profile", type="primary", use_container_width=True)
 
         with tab2:
             st.subheader("Academic Needs")
@@ -133,9 +133,12 @@ def render():
                 default=[v for v in (user.get('study_vibe') or []) if v in AVAILABLE_VIBES],
                 help="What atmosphere do you prefer?",
             )
+            # Save button inside Tab 3 — users don't have to scroll back to the bottom
+            submitted_t3 = st.form_submit_button("Save Profile", type="primary", use_container_width=True)
 
         st.markdown("---")
-        submitted = st.form_submit_button("Save Profile", type="primary", use_container_width=True)
+        submitted_bottom = st.form_submit_button("Save Profile", type="primary", use_container_width=True)
+        submitted = submitted_t1 or submitted_t3 or submitted_bottom
 
         if submitted:
             errors = []
@@ -167,9 +170,8 @@ def render():
                 success = database.update_user_profile(user_id, profile_data)
                 if success:
                     database.log_activity(user_id, 'profile_saved', {})
-                    cache_key = f"matches_{user_id}"
-                    st.session_state.pop(cache_key, None)
-                    st.toast("Profile saved!", icon="🎉")
+                    invalidate_match_cache(user_id)
+                    st.toast("Profile saved! Head to Matches & Groups to see updated scores.", icon="🎉")
                     st.rerun()
                 else:
                     st.error("Failed to save profile. Please check your inputs and try again.")
