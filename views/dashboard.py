@@ -106,7 +106,7 @@ def _render_platform_analytics():
         if subjects_without_groups:
             gap = subjects_without_groups[0]
             st.info(
-                f"💡 **Group gap:** {len(subject_counts.get(gap, 0))} or more students study "
+                f"💡 **Group gap:** {subject_counts.get(gap, 0)} or more students study "
                 f"**{gap}** but there are no groups yet — be the first to create one!"
             )
 
