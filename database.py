@@ -5,7 +5,7 @@ import bcrypt
 from datetime import datetime
 from sqlalchemy import (
     create_engine, Column, Integer, String, Text, DateTime,
-    Boolean, Table, ForeignKey, UniqueConstraint,
+    Boolean, Table, ForeignKey, UniqueConstraint, inspect, text,
 )
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from pydantic import BaseModel, Field, ValidationError, field_validator
@@ -293,9 +293,34 @@ class StudySession(Base):
 
 # ── DB Initialisation ─────────────────────────────────────────────────────────
 
+def _run_migrations():
+    """Add columns/tables introduced after the initial schema was deployed."""
+    is_pg = engine.dialect.name == 'postgresql'
+    bool_default = "FALSE" if is_pg else "0"
+    try:
+        insp = inspect(engine)
+        existing_tables = insp.get_table_names()
+
+        # study_groups — columns added in v2
+        if 'study_groups' in existing_tables:
+            sg_cols = {c['name'] for c in insp.get_columns('study_groups')}
+            with engine.begin() as conn:
+                if 'description' not in sg_cols:
+                    conn.execute(text("ALTER TABLE study_groups ADD COLUMN description TEXT DEFAULT ''"))
+                if 'max_members' not in sg_cols:
+                    conn.execute(text("ALTER TABLE study_groups ADD COLUMN max_members INTEGER DEFAULT 8"))
+                if 'is_private' not in sg_cols:
+                    conn.execute(text(f"ALTER TABLE study_groups ADD COLUMN is_private BOOLEAN DEFAULT {bool_default}"))
+                if 'creator_id' not in sg_cols:
+                    conn.execute(text("ALTER TABLE study_groups ADD COLUMN creator_id INTEGER REFERENCES users(id)"))
+    except Exception as e:
+        print(f"Migration warning: {e}")
+
+
 def init_db():
     try:
         Base.metadata.create_all(bind=engine)
+        _run_migrations()
     except Exception as e:
         print(f"Error initializing DB: {e}")
 
