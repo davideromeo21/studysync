@@ -74,7 +74,7 @@ SLOT_ICONS = ["🌅", "☀️", "🌙"]
 
 # Vibe incompatibility pairs — (set_a, set_b): penalty points
 # A conflict fires when user1 has any vibe in set_a AND user2 has any vibe in set_b (or vice-versa).
-VIBE_CONFLICT_PAIRS: list[tuple[set, set]] = [
+VIBE_CONFLICT_PAIRS = [
     ({"Silent 3 Hours"}, {"Chatty"}),
     ({"Intense Focus"}, {"Snacks & Study", "Chatty"}),
 ]
