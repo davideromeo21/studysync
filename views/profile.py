@@ -51,9 +51,9 @@ def render():
     tab2_label = f"2️⃣  Academic Needs {'⚠️' if missing_tab2 else '✅'}"
     tab3_label = "3️⃣  Study Preferences"
 
-    tab1, tab2, tab3 = st.tabs([tab1_label, tab2_label, tab3_label])
-
     with st.form("profile_form"):
+        tab1, tab2, tab3 = st.tabs([tab1_label, tab2_label, tab3_label])
+
         with tab1:
             st.subheader("Basic Information")
             name = st.text_input(
