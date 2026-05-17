@@ -5,6 +5,13 @@ from views import dashboard, profile, calendar_view, matches, workspace
 
 database.init_db()
 
+# Auto-seed sample data on first run (runs once; skipped if groups already exist)
+try:
+    import seed as _seed_module
+    _seed_module.seed()
+except Exception:
+    pass
+
 st.set_page_config(
     page_title="StudySync — Find Your Study Partner",
     page_icon="🎓",
