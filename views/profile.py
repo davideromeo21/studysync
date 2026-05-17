@@ -76,7 +76,7 @@ def render():
                     placeholder="e.g. BSc Data Science",
                 )
                 campus = st.text_input("Campus", value=user.get('campus') or "", placeholder="e.g. Main Campus")
-            submitted_t1 = st.form_submit_button("Save Profile", type="primary", use_container_width=True)
+            submitted_t1 = st.form_submit_button("Save Profile", type="primary", use_container_width=True, key="save_t1")
 
         with tab2:
             st.subheader("Academic Needs")
@@ -134,10 +134,10 @@ def render():
                 help="What atmosphere do you prefer?",
             )
             # Save button inside Tab 3 — users don't have to scroll back to the bottom
-            submitted_t3 = st.form_submit_button("Save Profile", type="primary", use_container_width=True)
+            submitted_t3 = st.form_submit_button("Save Profile", type="primary", use_container_width=True, key="save_t3")
 
         st.markdown("---")
-        submitted_bottom = st.form_submit_button("Save Profile", type="primary", use_container_width=True)
+        submitted_bottom = st.form_submit_button("Save Profile", type="primary", use_container_width=True, key="save_bottom")
         submitted = submitted_t1 or submitted_t3 or submitted_bottom
 
         if submitted:
