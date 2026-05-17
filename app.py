@@ -47,6 +47,9 @@ def inject_css():
 
     html, body, [class*="css"] { font-family: var(--font); }
     header { visibility: hidden; }
+    /* Keep the sidebar reopen button visible even when header is hidden */
+    [data-testid="collapsedControl"] { visibility: visible !important; }
+    button[data-testid="baseButton-headerNoPadding"] { visibility: visible !important; }
 
     .stApp {
         background: linear-gradient(145deg, #eef2ff 0%, #f8fafc 45%, #ecfdf5 100%);
